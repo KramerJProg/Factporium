@@ -50,17 +50,18 @@ const initialFacts = [
 function App() {
 	// State (Re-render the component) DEFINE STATE VARIABLE
 	const [showForm, setShowForm] = useState(false);
+	const [facts, setFacts] = useState(initialFacts);
 
 	return (
 		// JSX Syntax (Not HTML) React creates the JSX.
 		<>
 			<Header showForm={showForm} setShowForm={setShowForm} />
 
-			{showForm ? <NewFactForm /> : null}
+			{showForm ? <NewFactForm setFacts={setFacts} setShowForm={setShowForm} /> : null}
 
 			<main className="main">
 				<CategoryFilter />
-				<FactList />
+				<FactList facts={facts} />
 			</main>
 		</>
 	);
@@ -81,21 +82,60 @@ function Header({ showForm, setShowForm }) {
 	</header>
 }
 
-function NewFactForm() {
+function isValidHttpUrl(string) {
+	let url;
+	try {
+		url = new URL(string);
+	} catch (_) {
+		return false;
+	}
+	return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function NewFactForm({ setFacts, setShowForm }) {
 	const [text, setText] = useState("");
 	const [source, setSource] = useState("");
 	const [category, setCategory] = useState("");
 	const textLength = text.length;
 
 	function handleSubmit(e) {
+		// Prevent page from reloading.
 		e.preventDefault();
+
+		// Is Data Valid? If yes, create the new fact from the input.
+		if (text && isValidHttpUrl(source) && category && textLength <= 200) {
+			// New Fact Object.
+			const newFact = {
+				// ID is temporary in place of auto gen for DB.
+				id: Math.round(Math.random() * 1000),
+				text,
+				source,
+				category,
+				votesInteresting: 24,
+				votesMindblowing: 9,
+				votesFalse: 4,
+				createdIn: new Date().getFullYear(),
+			}
+			// Add new fact to be rendered to UI.
+			setFacts((facts) => [newFact, ...facts])
+
+			// Reset the input fields to default. Closing the form already resets the input fields, not needed to form reset.
+			// setText("");
+			// setSource("");
+			// setCategory("");
+
+			// Close the form upon submission.
+			setShowForm(false);
+		}
 	}
 
 	return (
 		<form className="fact-form" onSubmit={handleSubmit}>
 			<input type="text" placeholder="Share a fact with the world..." value={text} onChange={(e) => setText(e.target.value)} />
 			<span>{200 - textLength}</span>
-			<input type="text" placeholder="Trust worthy source..." value={source} onChange={(e) => setSource(e.target.value)} />
+
+			<input type="text" placeholder="https://example.com..." value={source} onChange={(e) => setSource(e.target.value)} />
+
 			<select value={category} onChange={(e) => setCategory(e.target.value)}>
 				<option value="">Choose Category:</option>
 				{CATEGORIES.map((cat) =>
@@ -127,9 +167,7 @@ function CategoryFilter() {
 	);
 }
 
-function FactList() {
-	const facts = initialFacts;
-
+function FactList({ facts }) {
 	return (
 		<section>
 			<ul className="facts-list">{
