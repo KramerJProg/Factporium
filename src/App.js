@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./style.css";
 
 
@@ -47,21 +48,15 @@ const initialFacts = [
 ];
 
 function App() {
-	const appTitle = "Factporium";
+	// State (Re-render the component) DEFINE STATE VARIABLE
+	const [showForm, setShowForm] = useState(false);
 
 	return (
 		// JSX Syntax (Not HTML) React creates the JSX.
 		<>
-			{/* HEADER */}
-			<header className="the-header">
-				<div className="logo">
-					<a href="index.html"><img src="logo.png" alt="Factporium Logo" /></a>
-					<h1 id="top-heading"><a href="index.html">{appTitle}</a></h1>
-				</div>
-				<button className="btn btn-large btn-open">Share a fact</button>
-			</header>
+			<Header showForm={showForm} setShowForm={setShowForm} />
 
-			<NewFactForm />
+			{showForm ? <NewFactForm /> : null}
 
 			<main className="main">
 				<CategoryFilter />
@@ -71,8 +66,46 @@ function App() {
 	);
 }
 
+function Header({ showForm, setShowForm }) {
+	const appTitle = "Factporium";
+
+	return <header className="the-header">
+		<div className="logo">
+			<a href="index.html"><img src="logo.png" alt="Factporium Logo" /></a>
+			<h1 id="top-heading"><a href="index.html">{appTitle}</a></h1>
+		</div>
+		<button className="btn btn-large btn-open"
+			onClick={() => setShowForm((show) => !show)}>
+			{showForm ? "Close" : "Share a Fact"}
+		</button>
+	</header>
+}
+
 function NewFactForm() {
-	return <form className="fact-form">Fact Form</form>
+	const [text, setText] = useState("");
+	const [source, setSource] = useState("");
+	const [category, setCategory] = useState("");
+	const textLength = text.length;
+
+	function handleSubmit(e) {
+		e.preventDefault();
+	}
+
+	return (
+		<form className="fact-form" onSubmit={handleSubmit}>
+			<input type="text" placeholder="Share a fact with the world..." value={text} onChange={(e) => setText(e.target.value)} />
+			<span>{200 - textLength}</span>
+			<input type="text" placeholder="Trust worthy source..." value={source} onChange={(e) => setSource(e.target.value)} />
+			<select value={category} onChange={(e) => setCategory(e.target.value)}>
+				<option value="">Choose Category:</option>
+				{CATEGORIES.map((cat) =>
+					<option key={cat.name} value={cat.name}>
+						{cat.name.toUpperCase()}
+					</option>)}
+			</select>
+			<button className="btn btn-large">Post</button>
+		</form>
+	);
 }
 
 function CategoryFilter() {
