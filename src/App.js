@@ -5,7 +5,7 @@ const CATEGORIES = [
 	{ name: "technology", color: "#3b82f6" },
 	{ name: "science", color: "#16a34a" },
 	{ name: "finance", color: "#ef4444" },
-	{ name: "society", color: "#eab308" },
+	{ name: "society", color: "#f59e0b" },
 	{ name: "entertainment", color: "#db2777" },
 	{ name: "health", color: "#14b8a6" },
 	{ name: "history", color: "#f97316" },
@@ -76,7 +76,22 @@ function NewFactForm() {
 }
 
 function CategoryFilter() {
-	return <aside>Category Filter</aside>
+	return (
+		<aside>
+			<ul>
+				<li className="cat">
+					<button className="btn btn-all-cats">All</button>
+				</li>
+				{CATEGORIES.map((cat) => (
+					<li key={cat.name} className="cat">
+						<button className="btn btn-cat" style={{ backgroundColor: cat.color }}>
+							{cat.name}
+						</button>
+					</li>
+				))}
+			</ul>
+		</aside>
+	);
 }
 
 function FactList() {
