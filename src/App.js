@@ -15,7 +15,6 @@ const CATEGORIES = [
 ];
 
 function App() {
-	// State (Re-render the component) DEFINE STATE VARIABLE
 	const [showForm, setShowForm] = useState(false);
 	const [facts, setFacts] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
