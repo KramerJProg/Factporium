@@ -198,14 +198,11 @@ function Fact({ fact, setFacts }) {
 			{fact.text}
 			<a className="source" href={fact.source} target="_blank">(Source)</a>
 		</p>
-		<span className="tag-tech" style={{
-			backgroundColor: CATEGORIES.find(
-				(cat) => cat.name === fact.category
-			).color
-		}}>
 
-			{fact.category}</span>
 		<div className="vote-buttons">
+			<span className="tag-tech" style={{ backgroundColor: CATEGORIES.find((cat) => cat.name === fact.category).color }}>
+				{fact.category}
+			</span>
 			<button onClick={() => handleVote("votesInteresting")} disabled={isUpdating}>👍 {fact.votesInteresting}</button>
 			<button onClick={() => handleVote("votesMindblowing")} disabled={isUpdating}>🤯 {fact.votesMindblowing}</button>
 			<button onClick={() => handleVote("votesFalse")} disabled={isUpdating}>⛔️ {fact.votesFalse}</button>
