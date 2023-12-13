@@ -8,7 +8,7 @@ body {
     background-color: #292524;
     color: #fafaf9;
     font-family: "Sono", sans-serif;
-    padding: 48px 64px;
+    padding: 48px 64px 0px;
 }
 
 .hidden {
@@ -21,6 +21,12 @@ body {
     font-size: 32px;
     font-weight: 600;
     margin-top: 24px;
+}
+
+.disputed {
+    color: #ef4444;
+    font-weight: 600;
+    margin-right: 10px;
 }
 
 #root {
@@ -50,12 +56,19 @@ body {
     display: grid;
     grid-template-columns: 250px 1fr;
     gap: 48px;
+    height: calc(100vh - 48px - 68px - 40px);
 }
 
 @media (max-width: 900px) {
     .main {
         grid-template-columns: 1fr;
+        height: auto;
     }
+}
+
+section {
+    overflow: scroll;
+    padding-bottom: 40px;
 }
 
 #top-heading {
@@ -251,6 +264,10 @@ ul {
     background-color: #292524;
 }
 
+.vote-buttons button:disabled {
+    background-color: #44403c;
+}
+
 @media (max-width: 1024px) {
     body {
         padding: 32px 48px;
@@ -265,3 +282,46 @@ ul {
         width: auto;
     }
 }
+
+@media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+  }
+
+  @media (max-width: 643px) {
+    .btn-large {
+        font-size: 15px;
+        padding: 17px 20px 14px;
+        --c1: #663dff;
+        --c2: #cf3a4e;
+    }
+  }
+   
+  @media (max-width: 600px) {
+    #root {
+      padding: 24px;
+    }
+   
+    .btn-large {
+        font-size: 15px;
+        padding: 17px 20px 14px;
+        margin-left: 5px;
+        --c1: #663dff;
+        --c2: #cf3a4e;
+    }
+
+    .header {
+      flex-direction: column;
+      gap: 16px;
+    }
+   
+    .fact-form {
+      padding: 16px;
+    }
+   
+    .fact {
+      padding: 12px 16px;
+    }
+  }
