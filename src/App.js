@@ -53,19 +53,29 @@ function App() {
 	const [showForm, setShowForm] = useState(false);
 	const [facts, setFacts] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [currentCategory, setCurrentCategory] = useState("all");
 
 	useEffect(function () {
 		async function getFacts() {
 			setIsLoading(true);
-			const { data: facts, error } = await supabase
-				.from('facts').select('*').order('votesInteresting', { ascending: true }).limit(1000);
+
+			let query = supabase
+				.from('facts')
+				.select('*');
+
+			if (currentCategory !== "all")
+				query = query.eq("category", currentCategory);
+
+			const { data: facts, error } = await query
+				.order('votesInteresting', { ascending: true })
+				.limit(1000);
 
 			if (!error) setFacts(facts);
 			else alert("There was a problem getting data");
 			setIsLoading(false);
 		}
 		getFacts();
-	}, []);
+	}, [currentCategory]);
 
 	return (
 		// JSX Syntax (Not HTML) React creates the JSX.
@@ -75,7 +85,7 @@ function App() {
 			{showForm ? <NewFactForm setFacts={setFacts} setShowForm={setShowForm} /> : null}
 
 			<main className="main">
-				<CategoryFilter />
+				<CategoryFilter setCurrentCategory={setCurrentCategory} />
 				{isLoading ? <Loader /> : <FactList facts={facts} />}
 			</main>
 		</>
@@ -167,16 +177,19 @@ function NewFactForm({ setFacts, setShowForm }) {
 	);
 }
 
-function CategoryFilter() {
+function CategoryFilter({ setCurrentCategory }) {
 	return (
 		<aside>
 			<ul>
 				<li className="cat">
-					<button className="btn btn-all-cats">All</button>
+					<button className="btn btn-all-cats"
+						onClick={() => setCurrentCategory("all")}>All</button>
 				</li>
 				{CATEGORIES.map((cat) => (
 					<li key={cat.name} className="cat">
-						<button className="btn btn-cat" style={{ backgroundColor: cat.color }}>
+						<button className="btn btn-cat"
+							style={{ backgroundColor: cat.color }}
+							onClick={() => setCurrentCategory(cat.name)}>
 							{cat.name}
 						</button>
 					</li>
@@ -187,6 +200,9 @@ function CategoryFilter() {
 }
 
 function FactList({ facts }) {
+	if (facts.length === 0)
+		return <p className="message">There are no facts for this category...Be the first poster!! </p>
+
 	return (
 		<section>
 			<ul className="facts-list">{
