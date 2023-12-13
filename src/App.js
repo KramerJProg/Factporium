@@ -14,40 +14,6 @@ const CATEGORIES = [
 	{ name: "news", color: "#8b5cf6" },
 ];
 
-const initialFacts = [
-	{
-		id: 1,
-		text: "React is being developed by Meta (formerly facebook)",
-		source: "https://opensource.fb.com/",
-		category: "technology",
-		votesInteresting: 24,
-		votesMindblowing: 9,
-		votesFalse: 4,
-		createdIn: 2021,
-	},
-	{
-		id: 2,
-		text: "Millennial dads spend 3 times as much time with their kids than their fathers spent with them. In 1982, 43% of fathers had never changed a diaper. Today, that number is down to 3%",
-		source:
-			"https://www.mother.ly/parenting/millennial-dads-spend-more-time-with-their-kids",
-		category: "society",
-		votesInteresting: 11,
-		votesMindblowing: 2,
-		votesFalse: 0,
-		createdIn: 2019,
-	},
-	{
-		id: 3,
-		text: "Lisbon is the capital of Portugal",
-		source: "https://en.wikipedia.org/wiki/Lisbon",
-		category: "society",
-		votesInteresting: 8,
-		votesMindblowing: 3,
-		votesFalse: 1,
-		createdIn: 2015,
-	},
-];
-
 function App() {
 	// State (Re-render the component) DEFINE STATE VARIABLE
 	const [showForm, setShowForm] = useState(false);
@@ -125,28 +91,39 @@ function NewFactForm({ setFacts, setShowForm }) {
 	const [text, setText] = useState("");
 	const [source, setSource] = useState("");
 	const [category, setCategory] = useState("");
+	const [isUploading, setIsUploading] = useState(false);
 	const textLength = text.length;
 
-	function handleSubmit(e) {
+	async function handleSubmit(e) {
 		// Prevent page from reloading.
 		e.preventDefault();
 
 		// Is Data Valid? If yes, create the new fact from the input.
 		if (text && isValidHttpUrl(source) && category && textLength <= 200) {
 			// New Fact Object.
-			const newFact = {
-				// ID is temporary in place of auto gen for DB.
-				id: Math.round(Math.random() * 1000),
-				text,
-				source,
-				category,
-				votesInteresting: 24,
-				votesMindblowing: 9,
-				votesFalse: 4,
-				createdIn: new Date().getFullYear(),
-			}
+			// const newFact = {
+			// 	// ID is temporary in place of auto gen for DB.
+			// 	id: Math.round(Math.random() * 1000),
+			// 	text,
+			// 	source,
+			// 	category,
+			// 	votesInteresting: 24,
+			// 	votesMindblowing: 9,
+			// 	votesFalse: 4,
+			// 	createdIn: new Date().getFullYear(),
+			// };
+
+			// Upload data to DB and receive new fact object.
+			setIsUploading(true);
+			const { data: newFact, error } = await supabase
+				.from("facts")
+				.insert([{ text, source, category }])
+				.select();
+			setIsUploading(false);
+
 			// Add new fact to be rendered to UI.
-			setFacts((facts) => [newFact, ...facts])
+			if (!error)
+				setFacts((facts) => [newFact[0], ...facts]);
 
 			// Reset the input fields to default. Closing the form already resets the input fields, not needed to form reset.
 			// setText("");
@@ -160,19 +137,19 @@ function NewFactForm({ setFacts, setShowForm }) {
 
 	return (
 		<form className="fact-form" onSubmit={handleSubmit}>
-			<input type="text" placeholder="Share a fact with the world..." value={text} onChange={(e) => setText(e.target.value)} />
+			<input type="text" placeholder="Share a fact with the world..." value={text} onChange={(e) => setText(e.target.value)} disabled={isUploading} />
 			<span>{200 - textLength}</span>
 
-			<input type="text" placeholder="https://example.com..." value={source} onChange={(e) => setSource(e.target.value)} />
+			<input type="text" placeholder="https://example.com..." value={source} onChange={(e) => setSource(e.target.value)} disabled={isUploading} />
 
-			<select value={category} onChange={(e) => setCategory(e.target.value)}>
+			<select value={category} onChange={(e) => setCategory(e.target.value)} disabled={isUploading}>
 				<option value="">Choose Category:</option>
 				{CATEGORIES.map((cat) =>
 					<option key={cat.name} value={cat.name}>
 						{cat.name.toUpperCase()}
 					</option>)}
 			</select>
-			<button className="btn btn-large">Post</button>
+			<button className="btn btn-large" disabled={isUploading}>Post</button>
 		</form>
 	);
 }
